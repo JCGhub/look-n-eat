@@ -1,7 +1,5 @@
 package htmlparser;
 
-import htmlparser.iLogger.Level;
-
 public interface iLogger{
 	public enum Level {DEBUG, INFO, WARNING, ERROR};
     

@@ -1,7 +1,5 @@
 package htmlparser;
 
-import htmlparser.iLogger.Level;
-
 public class DefaultLogger implements iLogger{
 	Level currLevel = Level.ERROR;
     
