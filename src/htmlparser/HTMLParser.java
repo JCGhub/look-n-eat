@@ -24,6 +24,7 @@ import org.w3c.dom.NodeList;
 import htmlparser.iLogger;
 import htmlparser.KeyValue;
 import htmlparser.HTMLParser.Method;
+import htmlparser.DefaultLogger;
 
 
 public class HTMLParser{
@@ -44,17 +45,22 @@ public class HTMLParser{
     
 
 	public HTMLParser(String URL) {
-		this.URL = URL;
-        
-        this.https = URL.toLowerCase().startsWith("https");
+        init(URL, Method.GET, new ArrayList<KeyValue>(), new ArrayList<String>(), new DefaultLogger());
 	}
     
 	public HTMLParser(String URL, ArrayList<String> xPaths) {
-		this.URL = URL;
+		init(URL, Method.GET, new ArrayList<KeyValue>(), xPaths, new DefaultLogger());
+	}
+	
+	private void init(String URL, Method method, ArrayList<KeyValue> parameters, ArrayList<String> xPaths, iLogger logger) {
+        this.URL = URL;
+        this.parameters = parameters;
         this.xPaths = xPaths;
+        this.setLogger(logger);
+        this.method = method;
         
         this.https = URL.toLowerCase().startsWith("https");
-	}
+    }
 	
 	public ArrayList<String> download() {
         if(xPaths.size() > 0) {
@@ -209,6 +215,14 @@ public class HTMLParser{
         }
         
         return urlParameters;
+    }
+    
+    public iLogger getLogger() {
+        return logger;
+    }
+    
+    public void setLogger(iLogger logger) {
+        this.logger = logger;
     }
 	
 	public Document getDoc() {
