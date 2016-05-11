@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.util.*;
 import java.net.HttpURLConnection;
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.ParserConfigurationException;
@@ -33,7 +33,8 @@ public class HTMLParser{
     
 	String URL;
 	ArrayList<KeyValue> parameters;
-	ArrayList<String> xPaths;
+	ArrayList<String> xPaht1;
+	ArrayList<String> xPaht2;
 	ArrayList<KeyValue> requestProperties = new ArrayList<KeyValue>();
 	ArrayList<KeyValue> responseProperties = new ArrayList<KeyValue>();
 	private iLogger logger = null;
@@ -45,17 +46,22 @@ public class HTMLParser{
     
 
 	public HTMLParser(String URL) {
-        init(URL, Method.GET, new ArrayList<KeyValue>(), new ArrayList<String>(), new DefaultLogger());
+        init(URL, Method.GET, new ArrayList<KeyValue>(), new ArrayList<String>(), new ArrayList<String>(), new DefaultLogger());
 	}
     
-	public HTMLParser(String URL, ArrayList<String> xPaths) {
-		init(URL, Method.GET, new ArrayList<KeyValue>(), xPaths, new DefaultLogger());
+	public HTMLParser(String URL, ArrayList<String> xPaht1) {
+		init(URL, Method.GET, new ArrayList<KeyValue>(), xPaht1, new ArrayList<String>(), new DefaultLogger());
 	}
 	
-	private void init(String URL, Method method, ArrayList<KeyValue> parameters, ArrayList<String> xPaths, iLogger logger) {
+	public HTMLParser(String URL, ArrayList<String> xPaht1, ArrayList<String> xPath2) {
+		init(URL, Method.GET, new ArrayList<KeyValue>(), xPaht1, xPath2, new DefaultLogger());
+	}
+	
+	private void init(String URL, Method method, ArrayList<KeyValue> parameters, ArrayList<String> xPaht1, ArrayList<String> xPaht2, iLogger logger) {
         this.URL = URL;
         this.parameters = parameters;
-        this.xPaths = xPaths;
+        this.xPaht1 = xPaht1;
+        this.xPaht2 = xPaht2;
         this.setLogger(logger);
         this.method = method;
         
@@ -63,8 +69,8 @@ public class HTMLParser{
     }
 	
 	public ArrayList<String> download() {
-        if(xPaths.size() > 0) {
-            ArrayList<String> results = new ArrayList<String>(xPaths.size());
+        if(xPaht1.size() > 0) {
+            ArrayList<String> results = new ArrayList<String>(xPaht1.size());
             
             try {
                 TagNode tagNode = new HtmlCleaner().clean(doRequest().toString());
@@ -72,12 +78,49 @@ public class HTMLParser{
                 
                 XPath xpath = XPathFactory.newInstance().newXPath();
                 
-                for(String path: xPaths) {
-                    NodeList nodes = (NodeList) xpath.evaluate(path, getDoc(),
-                                    XPathConstants.NODESET);
+                for(String path: xPaht1) {
+                    NodeList nodes = (NodeList) xpath.evaluate(path, getDoc(), XPathConstants.NODESET);
 
                     for (int i = 0; i < nodes.getLength(); i++) {
                         results.add(nodes.item(i).getTextContent());
+                    }
+                }
+                
+                return results;
+            } catch (XPathExpressionException e) {
+                    e.printStackTrace();
+                    logger.log(e.getMessage());
+            } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                    logger.log(e.getMessage());
+            } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.log(e.getMessage());
+            }            
+        }
+        return null;     
+    }
+	
+	public Map<String, String> downloadRestAndURL() {
+        if(xPaht1.size() > 0) {
+        	Map<String, String> results = new HashMap<String, String>();
+            
+            try {
+                TagNode tagNode = new HtmlCleaner().clean(doRequest().toString());
+                doc = new DomSerializer(new CleanerProperties()).createDOM(tagNode);
+                
+                XPath xpath1 = XPathFactory.newInstance().newXPath();
+                XPath xpath2 = XPathFactory.newInstance().newXPath();
+                int j = 0;
+                
+                for(String path: xPaht1) {
+                    NodeList nodes1 = (NodeList) xpath1.evaluate(path, getDoc(), XPathConstants.NODESET);
+                    NodeList nodes2 = (NodeList) xpath2.evaluate(xPaht2.get(j), getDoc(), XPathConstants.NODESET);
+                    
+                    j++;
+                    
+                    for (int i = 0; i < nodes1.getLength(); i++) {
+                        results.put(nodes1.item(i).getTextContent(), "https://www.tripadvisor.es"+nodes2.item(i).getTextContent());
                     }
                 }
                 

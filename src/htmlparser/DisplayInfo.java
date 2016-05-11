@@ -5,14 +5,20 @@ import java.util.*;
 public class DisplayInfo{	
 	
 	Map<String, ArrayList<String>> mapRest;
-	ArrayList<String> xPaths;
+	Map<String, String> mapNameRest;
+	ArrayList<String> xPaths1;
+	ArrayList<String> xPaths2;
 	String route;
+	String route2;
 	String URL;
 	
-	public DisplayInfo(Map<String, ArrayList<String>> mapRest, ArrayList<String> xPaths, String route, String URL){
+	public DisplayInfo(Map<String, ArrayList<String>> mapRest, Map<String, String> mapNameRest, ArrayList<String> xPaths1, ArrayList<String> xPaths2, String route, String route2, String URL){
 		this.mapRest = mapRest;
-		this.xPaths = xPaths;
+		this.mapNameRest = mapNameRest;
+		this.xPaths1 = xPaths1;
+		this.xPaths2 = xPaths2;
 		this.route = route;
+		this.route2 = route2;
 		this.URL = URL;
 	}
 	
@@ -20,21 +26,24 @@ public class DisplayInfo{
 		return this.mapRest;
 	}
 	
-	public Map<String, ArrayList<String>> downloadNameRest(){
-		xPaths.add(route);
+	public void downloadNameRest(){
+		xPaths1.add(route);
+		xPaths2.add(route2);
 
-        HTMLParser request = new HTMLParser(URL, xPaths);
-        ArrayList<String> results = request.download();
-        if(results != null){
-            for(String values:results){
-                System.out.println(values);
-            	
-            	mapRest.put(values, null);
-            }
-        }
-		
-		return mapRest;
+        HTMLParser request = new HTMLParser(URL, xPaths1, xPaths2);
+        mapNameRest = request.downloadRestAndURL();
     }
+	
+	public void displayMapNameRest(){
+		if(mapNameRest.isEmpty()){
+			System.out.println("Vacio");
+		}
+		else{
+			for(String key : mapNameRest.keySet()){
+			    System.out.println("\nRestaurante: "+key+"URL: "+mapNameRest.get(key));
+			}
+		}
+	}
 	
 	/*public Map<String, ArrayList<String>> downloadInfoRest(){
 		
@@ -55,15 +64,17 @@ public class DisplayInfo{
 	
 	public static void main(String[] args) throws Exception {
 		Map<String, ArrayList<String>> mapRest = new HashMap<String, ArrayList<String>>();
-		ArrayList<String> xPaths = new ArrayList<>();
+		Map<String, String> mapNameRest = new HashMap<String, String>();
+		ArrayList<String> xPaths1 = new ArrayList<>();
+		ArrayList<String> xPaths2 = new ArrayList<>();
 		String route = "//a[@class='property_title']";
+		String route2 = "//div/div/h3/a/@href";
 		String URL = "https://www.tripadvisor.es/Restaurants-g187432-Cadiz_Costa_de_la_Luz_Andalucia.html";
 		
-		DisplayInfo dI = new DisplayInfo(mapRest, xPaths, route, URL);
+		DisplayInfo dI = new DisplayInfo(mapRest, mapNameRest, xPaths1, xPaths2, route, route2, URL);
 		
-		mapRest = dI.downloadNameRest();
-		
-		dI.displayMap();
+		dI.downloadNameRest();		
+		dI.displayMapNameRest();
 		
 		/*ArrayList<String> xPaths = new ArrayList<>();
         xPaths.add("//a[@class='property_title']");
