@@ -33,8 +33,8 @@ public class HTMLParser{
     
 	String URL;
 	ArrayList<KeyValue> parameters;
-	ArrayList<String> xPaht1;
-	ArrayList<String> xPaht2;
+	ArrayList<String> xPath1;
+	ArrayList<String> xPath2;
 	ArrayList<KeyValue> requestProperties = new ArrayList<KeyValue>();
 	ArrayList<KeyValue> responseProperties = new ArrayList<KeyValue>();
 	private iLogger logger = null;
@@ -49,19 +49,19 @@ public class HTMLParser{
         init(URL, Method.GET, new ArrayList<KeyValue>(), new ArrayList<String>(), new ArrayList<String>(), new DefaultLogger());
 	}
     
-	public HTMLParser(String URL, ArrayList<String> xPaht1) {
-		init(URL, Method.GET, new ArrayList<KeyValue>(), xPaht1, new ArrayList<String>(), new DefaultLogger());
+	public HTMLParser(String URL, ArrayList<String> xPath1) {
+		init(URL, Method.GET, new ArrayList<KeyValue>(), xPath1, new ArrayList<String>(), new DefaultLogger());
 	}
 	
-	public HTMLParser(String URL, ArrayList<String> xPaht1, ArrayList<String> xPath2) {
-		init(URL, Method.GET, new ArrayList<KeyValue>(), xPaht1, xPath2, new DefaultLogger());
+	public HTMLParser(String URL, ArrayList<String> xPath1, ArrayList<String> xPath2) {
+		init(URL, Method.GET, new ArrayList<KeyValue>(), xPath1, xPath2, new DefaultLogger());
 	}
 	
-	private void init(String URL, Method method, ArrayList<KeyValue> parameters, ArrayList<String> xPaht1, ArrayList<String> xPaht2, iLogger logger) {
+	private void init(String URL, Method method, ArrayList<KeyValue> parameters, ArrayList<String> xPath1, ArrayList<String> xPath2, iLogger logger) {
         this.URL = URL;
         this.parameters = parameters;
-        this.xPaht1 = xPaht1;
-        this.xPaht2 = xPaht2;
+        this.xPath1 = xPath1;
+        this.xPath2 = xPath2;
         this.setLogger(logger);
         this.method = method;
         
@@ -69,8 +69,8 @@ public class HTMLParser{
     }
 	
 	public ArrayList<String> download() {
-        if(xPaht1.size() > 0) {
-            ArrayList<String> results = new ArrayList<String>(xPaht1.size());
+        if(xPath1.size() > 0) {
+            ArrayList<String> results = new ArrayList<String>(xPath1.size());
             
             try {
                 TagNode tagNode = new HtmlCleaner().clean(doRequest().toString());
@@ -78,7 +78,7 @@ public class HTMLParser{
                 
                 XPath xpath = XPathFactory.newInstance().newXPath();
                 
-                for(String path: xPaht1) {
+                for(String path: xPath1) {
                     NodeList nodes = (NodeList) xpath.evaluate(path, getDoc(), XPathConstants.NODESET);
 
                     for (int i = 0; i < nodes.getLength(); i++) {
@@ -102,7 +102,7 @@ public class HTMLParser{
     }
 	
 	public Map<String, String> downloadRestAndURL() {
-        if(xPaht1.size() > 0) {
+        if(xPath1.size() > 0) {
         	Map<String, String> results = new HashMap<String, String>();
             
             try {
@@ -113,14 +113,23 @@ public class HTMLParser{
                 XPath xpath2 = XPathFactory.newInstance().newXPath();
                 int j = 0;
                 
-                for(String path: xPaht1) {
+                for(String path: xPath1) {
                     NodeList nodes1 = (NodeList) xpath1.evaluate(path, getDoc(), XPathConstants.NODESET);
-                    NodeList nodes2 = (NodeList) xpath2.evaluate(xPaht2.get(j), getDoc(), XPathConstants.NODESET);
+                    NodeList nodes2 = (NodeList) xpath2.evaluate(xPath2.get(j), getDoc(), XPathConstants.NODESET);
                     
                     j++;
                     
                     for (int i = 0; i < nodes1.getLength(); i++) {
-                        results.put(nodes1.item(i).getTextContent(), "https://www.tripadvisor.es"+nodes2.item(i).getTextContent());
+                    	String str = nodes1.item(i).getTextContent();
+                    	
+                    	String str2 = str.replaceAll("\n", "");
+                    	
+                        /*for (int x=0;x<str2.length();x++){
+                            System.out.print(str2.charAt(x) + " = " + str2.codePointAt(x)+", ");;
+                        }*/
+                        
+                        //System.out.print(str2.length()+", "+str2+", ");
+                        results.put(str2, "https://www.tripadvisor.es"+nodes2.item(i).getTextContent());
                     }
                 }
                 
