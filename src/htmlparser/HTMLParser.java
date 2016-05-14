@@ -148,6 +148,38 @@ public class HTMLParser{
         return null;     
     }
 	
+	public String downloadString(){
+        if(xPath1.size() > 0) {
+        	String result = new String();
+            
+            try {
+                TagNode tagNode = new HtmlCleaner().clean(doRequest().toString());
+                doc = new DomSerializer(new CleanerProperties()).createDOM(tagNode);
+                
+                XPath xpath = XPathFactory.newInstance().newXPath();
+                for(String path: xPath1){
+                	NodeList nodes = (NodeList) xpath.evaluate(path, getDoc(), XPathConstants.NODESET);
+
+                    for (int i = 0; i < nodes.getLength(); i++) {
+                        result = nodes.item(i).getTextContent();
+                    }
+                }
+                
+                return result;
+            } catch (XPathExpressionException e) {
+                    e.printStackTrace();
+                    logger.log(e.getMessage());
+            } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                    logger.log(e.getMessage());
+            } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.log(e.getMessage());
+            }            
+        }
+        return null;     
+    }
+	
 	private StringBuffer doRequest() throws Exception {
         return doRequest(-1);
     }

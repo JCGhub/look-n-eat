@@ -10,6 +10,8 @@ public class DisplayInfo{
 	ArrayList<String> xPath1;
 	ArrayList<String> xPath2;
 	String URL;
+	String numPages = new String();
+	int n = 1;
 	
 	public DisplayInfo(Map<String, ArrayList<String>> mapRest, Map<String, String> mapNameRest, ArrayList<String> xPath1, ArrayList<String> xPath2, String URL){
 		this.mapRest = mapRest;
@@ -19,38 +21,48 @@ public class DisplayInfo{
 		this.URL = URL;
 	}
 	
-	public Map<String, String> downloadNameRest(){
+	public Map<String, String> downloadNameRest(String URL){
 		HTMLParser request = new HTMLParser(URL, xPath1, xPath2);
         mapNameRest = request.downloadRestAndURL();
         
         return mapNameRest;
     }	
 	
-	public void downloadCommRest(String URL, ArrayList<String> xPath3){
+	public void downloadCommRest(String key, String URL, ArrayList<String> xPath3, Map<String, ArrayList<String>> mapNameComm){
 		HTMLParser request = new HTMLParser(URL, xPath3);
         arrayComm = request.download();
+        
+        mapNameComm.put(key, arrayComm);
     }
+	
+	public String downloadNumPages(ArrayList<String> xPath3){
+		HTMLParser request = new HTMLParser(URL, xPath3);
+		numPages = request.downloadString();
+		
+		return numPages;
+	}
 	
 	public void displayMapNameRest(){
 		if(mapNameRest.isEmpty()){
 			System.out.println("Vacio");
 		}
-		else{
+		else{			
 			for(String key : mapNameRest.keySet()){
-			    //System.out.println("\nRestaurante: "+key+"URL: "+mapNameRest.get(key));
-				System.out.println(key);
+			    System.out.println("\nRestaurante "+n+": "+key);
+			    
+			    n++;
 			}
 		}
 	}
 	
-	public void displayArrayComm(){
-		if(arrayComm.isEmpty()){
+	public void displayMapCommRest(Map<String, ArrayList<String>> mapNameComm){
+		if(mapNameComm.isEmpty()){
 			System.out.println("Vacio");
 		}
 		else{
-            for(String values : arrayComm){
-                System.out.println(values);
-            }
+			for(String key : mapNameComm.keySet()){
+			    System.out.println("\nRestaurante: "+key+"\nComment: "+mapNameComm.get(key).get(1));
+			}
         }
 	}
 	
@@ -62,73 +74,60 @@ public class DisplayInfo{
 		return this.mapRest;
 	}	
 	
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception{
 		Map<String, ArrayList<String>> mapRest = new HashMap<String, ArrayList<String>>();
 		Map<String, String> mapNameRest = new HashMap<String, String>();
 		ArrayList<String> xPath1 = new ArrayList<>();
 		ArrayList<String> xPath2 = new ArrayList<>();
 		xPath1.add("//a[@class='property_title']");
 		xPath2.add("//div/div/h3/a/@href");
-		String URL = "https://www.tripadvisor.es/Restaurants-g187432-Cadiz_Costa_de_la_Luz_Andalucia.html";
+		String URL = "https://www.tripadvisor.es/Restaurants-g187432-[[oaxx]]-Cadiz_Costa_de_la_Luz_Andalucia.html";
+		//String URL = "https://www.tripadvisor.es/Restaurants-g187433-[[oaxx]]-Chiclana_de_la_Frontera_Costa_de_la_Luz_Andalucia.html";
 		
 		DisplayInfo dI = new DisplayInfo(mapRest, mapNameRest, xPath1, xPath2, URL);
 		
-		mapNameRest = dI.downloadNameRest();		
-		dI.displayMapNameRest();
+		ArrayList<String> xPath4 = new ArrayList<>();
+		xPath4.add("//div[3]/div/div/a[6]/@data-page-number");
+		String numPagesStr = dI.downloadNumPages(xPath4);
+		int numPages = Integer.parseInt(numPagesStr);
+		
+		System.out.println("Numero de paginas: "+numPages);
+		
+		System.out.println("-------------------- RESTAURANTS --------------------");
+		
+		int URLNumPatt = 0;
+		String URLPatt = "oa";
+		String patt = "[[oaxx]]";
+		
+		for(int i = 0; i < numPages; i++){
+			String newPatt = URLPatt+URLNumPatt;
+			String URLgen = URL.replace(patt, newPatt);
+			
+			URLNumPatt = URLNumPatt + 30;
+			URL = URLgen;
+			patt = newPatt;
+			
+			mapNameRest = dI.downloadNameRest(URL);
+			System.out.println("\n"+URL);
+			dI.displayMapNameRest();
+		}
+		
+		/*mapNameRest = dI.downloadNameRest();		
+		dI.displayMapNameRest();*/		
+		
+		/*System.out.println("-------------------- COMMENTS --------------------");
 		
 		ArrayList<String> xPath3 = new ArrayList<>();
 		xPath3.add("//div[2]/div/div/div[3]/p");
 		
-		System.out.println("------------------------------------------------------------");
+		Map<String, ArrayList<String>> mapNameComm = new HashMap<String, ArrayList<String>>();
 		
-		String URL2 = (String)mapNameRest.get("Sopranis");		
-		System.out.println(URL2);
-		
-		dI.downloadCommRest(URL2, xPath3);
-		dI.displayArrayComm();
-		
-		
-		/*ArrayList<String> xPaths = new ArrayList<>();
-        xPaths.add("//a[@class='property_title']");
-        HTMLParser request2 = new HTMLParser("https://www.tripadvisor.es/Restaurants-g187432-Cadiz_Costa_de_la_Luz_Andalucia.html", xPaths);
-        ArrayList<String> results = request2.download();
-        if (results != null) {
-            for (String values : results) {
-                System.out.println(values);
-            }
-        }*/
-		
-		/*Map<String, ArrayList<String>> nombreMap = new HashMap<String, ArrayList<String>>();
-		nombreMap.size(); // Devuelve el numero de elementos del Map
-		
-		if(nombreMap.isEmpty()){
-			System.out.println("Vacio");
-		}
-		else{
-			System.out.println("Tiene elementos");
+		for(String key : mapNameRest.keySet()){
+			String URLRest = (String)mapNameRest.get(key);
+			
+		    dI.downloadCommRest(key, URLRest, xPath3, mapNameComm);
 		}
 		
-		ArrayList<String> a = new ArrayList<String>();
-		
-		a.add("La Iberica");
-		a.add("Calle Cangrejo");
-		
-		nombreMap.put("Res1", a);
-		
-		if(nombreMap.isEmpty()){
-			System.out.println("Vacio");
-		}
-		else{
-			System.out.println("Tiene elementos");
-		}
-		
-		System.out.println(nombreMap.get("Res1").get(1));
-
-		if(nombreMap.isEmpty()){
-			System.out.println("Vacio");
-		}
-		else{
-			System.out.println("Tiene elementos");
-		}*/
+		dI.displayMapCommRest(mapNameComm);*/
 	}
 }
