@@ -47,10 +47,41 @@ public class ConnectDB{
  
     public void createTable(String name) {
         try {
-            String Query = "CREATE TABLE " + name + ""
-                    + "(ID VARCHAR(25),Nombre VARCHAR(50), Apellido VARCHAR(50),"
-                    + " Edad VARCHAR(3), Sexo VARCHAR(1))";
+            String Query = "CREATE TABLE "+ name + ""
+            		+ "(idRest int(255) NOT NULL AUTO_INCREMENT, "
+            		+ "nRest text NOT NULL, "
+            		+ "urlRest text NOT NULL, "
+            		+ "idComm int(255), "
+            		+ "idVal int(255), "
+            		+ "idInfo int(255), "
+            		+ "PRIMARY KEY(idRest))"
+            		+ "ENGINE=InnoDB DEFAULT CHARSET=latin1";
+            
             JOptionPane.showMessageDialog(null, "The table " + name + " has been created successfully!");
+            Statement st = Conn.createStatement();
+            st.executeUpdate(Query);
+        } catch (SQLException ex) {
+            Logger.getLogger(ConnectDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void insertData(String tName, String nRest, String urlRest){
+        try {
+            String Query = "INSERT INTO "+tName+" (idRest, nRest, urlRest, idComm, idVal, idInfo) "
+            		+ "VALUES (NULL, '"+nRest+"', '"+urlRest+"', NULL, NULL, NULL);";
+            Statement st = Conn.createStatement();
+            st.executeUpdate(Query);
+            //JOptionPane.showMessageDialog(null, "Datos almacenados de forma exitosa");
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error en el almacenamiento de datos del restaurante "+nRest);
+        }
+    }
+    
+    public void deleteTable(String name) {
+        try {
+            String Query = "DELETE TABLE "+ name + "";
+            
+            JOptionPane.showMessageDialog(null, "The table " + name + " has been deleted successfully!");
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);
         } catch (SQLException ex) {

@@ -122,14 +122,17 @@ public class HTMLParser{
                     for (int i = 0; i < nodes1.getLength(); i++) {
                     	String str = nodes1.item(i).getTextContent();
                     	
-                    	String str2 = str.replaceAll("\n", "");
+                    	//String str2 = str.replaceAll("\n", "");
+                    	
+                    	String str2 = str.replace("\n", "");
+                    	str = str2.replace("'", "\\'");
                     	
                         /*for (int x=0;x<str2.length();x++){
                             System.out.print(str2.charAt(x) + " = " + str2.codePointAt(x)+", ");;
                         }*/
                         
                         //System.out.print(str2.length()+", "+str2+", ");
-                        results.put(str2, "https://www.tripadvisor.es"+nodes2.item(i).getTextContent());
+                        results.put(str, "https://www.tripadvisor.es"+nodes2.item(i).getTextContent());
                     }
                 }
                 

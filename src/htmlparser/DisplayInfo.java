@@ -1,4 +1,5 @@
 package htmlparser;
+import database.*;
 
 import java.util.*;
 
@@ -6,12 +7,14 @@ public class DisplayInfo{
 	
 	Map<String, ArrayList<String>> mapRest;
 	Map<String, String> mapNameRest;
+	Map<String, String> mapNameRest2 = new HashMap<String, String>();
 	ArrayList<String> arrayComm = new ArrayList<String>();
 	ArrayList<String> xPath1;
 	ArrayList<String> xPath2;
 	String URL;
 	String numPages = new String();
 	int n = 1;
+	ConnectDB db = new ConnectDB();
 	
 	public DisplayInfo(Map<String, ArrayList<String>> mapRest, Map<String, String> mapNameRest, ArrayList<String> xPath1, ArrayList<String> xPath2, String URL){
 		this.mapRest = mapRest;
@@ -21,11 +24,19 @@ public class DisplayInfo{
 		this.URL = URL;
 	}
 	
-	public Map<String, String> downloadNameRest(String URL){
+	public void downloadNameRest(String URL){
 		HTMLParser request = new HTMLParser(URL, xPath1, xPath2);
-        mapNameRest = request.downloadRestAndURL();
+        mapNameRest2 = request.downloadRestAndURL();
         
-        return mapNameRest;
+        for(String key : mapNameRest2.keySet()){
+        	if(mapNameRest.containsKey(key)){
+        		//System.out.println("***** YA HAY UN RESTAURANTE CON EL NOMBRE "+key+" *****");
+        	}
+        	else{
+        		mapNameRest.put(key, mapNameRest2.get(key));    		    
+    		    //System.out.println(key);
+        	}		    
+        }
     }	
 	
 	public void downloadCommRest(String key, String URL, ArrayList<String> xPath3, Map<String, ArrayList<String>> mapNameComm){
@@ -66,6 +77,24 @@ public class DisplayInfo{
         }
 	}
 	
+	public void startConnectionDB(){
+		db.MySQLConnection("root", "", "lookneat_db");
+	}
+	
+	public void closeConnectionDB(){
+		db.closeConnection();
+	}
+	
+	public void createTable(String nTable){
+		db.createTable(nTable);
+	}
+	
+	public void insertMapNameRestIntoDB(String nTable){
+		for(String key : mapNameRest.keySet()){
+			db.insertData(nTable, key, mapNameRest.get(key));
+		}
+	}
+	
 	public Map<String, String> getMapNameRest(){
 		return this.mapNameRest;
 	}
@@ -83,6 +112,7 @@ public class DisplayInfo{
 		xPath2.add("//div/div/h3/a/@href");
 		String URL = "https://www.tripadvisor.es/Restaurants-g187432-[[oaxx]]-Cadiz_Costa_de_la_Luz_Andalucia.html";
 		//String URL = "https://www.tripadvisor.es/Restaurants-g187433-[[oaxx]]-Chiclana_de_la_Frontera_Costa_de_la_Luz_Andalucia.html";
+		String nTable = "test_table";
 		
 		DisplayInfo dI = new DisplayInfo(mapRest, mapNameRest, xPath1, xPath2, URL);
 		
@@ -93,7 +123,7 @@ public class DisplayInfo{
 		
 		System.out.println("Numero de paginas: "+numPages);
 		
-		System.out.println("-------------------- RESTAURANTS --------------------");
+		//System.out.println("-------------------- RESTAURANTS --------------------");
 		
 		int URLNumPatt = 0;
 		String URLPatt = "oa";
@@ -107,10 +137,24 @@ public class DisplayInfo{
 			URL = URLgen;
 			patt = newPatt;
 			
-			mapNameRest = dI.downloadNameRest(URL);
-			System.out.println("\n"+URL);
-			dI.displayMapNameRest();
+			dI.downloadNameRest(URL);
+			//System.out.println("\n"+URL);
+			//dI.displayMapNameRest();
 		}
+		
+		System.out.println("Numero de restaurantes: "+dI.getMapNameRest().size());
+		
+		//dI.displayMapNameRest();
+		
+		System.out.println("-------------------- DATABASE --------------------");
+		
+		dI.startConnectionDB();
+		
+		dI.createTable(nTable);
+		dI.insertMapNameRestIntoDB(nTable);		
+		
+		dI.closeConnectionDB();
+		
 		
 		/*mapNameRest = dI.downloadNameRest();		
 		dI.displayMapNameRest();*/		
