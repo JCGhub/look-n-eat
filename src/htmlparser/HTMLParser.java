@@ -3,6 +3,7 @@ package htmlparser;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
@@ -25,7 +26,6 @@ import htmlparser.iLogger;
 import htmlparser.KeyValue;
 import htmlparser.HTMLParser.Method;
 import htmlparser.DefaultLogger;
-
 
 public class HTMLParser{
 
@@ -68,7 +68,7 @@ public class HTMLParser{
         this.https = URL.toLowerCase().startsWith("https");
     }
 	
-	public ArrayList<String> download() {
+	public ArrayList<String> downloadAsArray() {
         if(xPath1.size() > 0) {
             ArrayList<String> results = new ArrayList<String>(xPath1.size());
             
@@ -101,7 +101,7 @@ public class HTMLParser{
         return null;     
     }
 	
-	public Map<String, String> downloadRestAndURL() {
+	public Map<String, String> downloadAsMap() {
         if(xPath1.size() > 0) {
         	Map<String, String> results = new HashMap<String, String>();
             
@@ -151,7 +151,7 @@ public class HTMLParser{
         return null;     
     }
 	
-	public String downloadString(){
+	public String downloadAsString(){
         if(xPath1.size() > 0) {
         	String result = new String();
             
@@ -293,7 +293,12 @@ public class HTMLParser{
             }
         } else {
             for(KeyValue par: parameters) {
-                urlParameters += "&" + URLEncoder.encode(par.key) + "=" + URLEncoder.encode(par.value);
+                try {
+					urlParameters += "&" + URLEncoder.encode(par.key, "UTF-8") + "=" + URLEncoder.encode(par.value, "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					System.out.println("Unsupported Encoding");
+					e.printStackTrace();
+				}
             }
         }
         

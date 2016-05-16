@@ -2,10 +2,12 @@ package database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.*;
 
 import javax.swing.JOptionPane;
 
@@ -45,7 +47,7 @@ public class ConnectDB{
         }
     }
  
-    public void createTable(String name) {
+    public void createTableNames(String name){
         try {
             String Query = "CREATE TABLE "+ name + ""
             		+ "(idRest int(255) NOT NULL AUTO_INCREMENT, "
@@ -65,16 +67,66 @@ public class ConnectDB{
         }
     }
     
-    public void insertData(String tName, String nRest, String urlRest){
+    public void createTableComm(String name){
+        try {
+            String Query = "CREATE TABLE "+ name + ""
+            		+ "(idComm int(255) NOT NULL AUTO_INCREMENT, "
+            		+ "idRest int(255) NOT NULL, "
+            		+ "ctext text, "
+            		+ "PRIMARY KEY(idComm))"
+            		+ "ENGINE=InnoDB DEFAULT CHARSET=latin1";
+            
+            JOptionPane.showMessageDialog(null, "The table " + name + " has been created successfully!");
+            Statement st = Conn.createStatement();
+            st.executeUpdate(Query);
+        } catch (SQLException ex) {
+            Logger.getLogger(ConnectDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void insertDataTableNames(String tName, String nRest, String urlRest){
         try {
             String Query = "INSERT INTO "+tName+" (idRest, nRest, urlRest, idComm, idVal, idInfo) "
             		+ "VALUES (NULL, '"+nRest+"', '"+urlRest+"', NULL, NULL, NULL);";
+            
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);
             //JOptionPane.showMessageDialog(null, "Datos almacenados de forma exitosa");
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Error en el almacenamiento de datos del restaurante "+nRest);
         }
+    }
+    
+    public void insertDataTableComm(String tName, int idRest, String comm){
+    	//System.out.println("Entrando en función de inserción en BD");
+        try {
+            String Query = "INSERT INTO "+tName+" (idComm, idRest, ctext) "
+            		+ "VALUES (NULL, '"+idRest+"', '"+comm+"');";
+            
+            //System.out.println("Query creada");
+            Statement st = Conn.createStatement();
+            st.executeUpdate(Query);
+            //System.out.println("Query ejecutada en BD");
+            //JOptionPane.showMessageDialog(null, "Datos almacenados de forma exitosa");
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error en el almacenamiento de comentarios de restaurante");
+        }
+    }
+    
+    public ResultSet getNames(String table_name){
+    	ResultSet rSet = null;
+    	
+        try {
+            String Query = "SELECT idRest, nRest, urlRest FROM " + table_name;
+            
+            Statement st = Conn.createStatement();
+            rSet = st.executeQuery(Query);
+ 
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error en la adquisición de datos");
+        }
+        
+        return rSet;
     }
     
     public void deleteTable(String name) {

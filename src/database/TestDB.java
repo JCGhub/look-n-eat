@@ -5,8 +5,8 @@ public class TestDB{
 		ConnectDB db = new ConnectDB();
 		db.MySQLConnection("root", "", "lookneat_db");
 		
-		db.createTable("testtable");
-		db.insertData("testtable", "El faro", "https://tripadvisor.es/elfaro");		
+		//db.createTableNames("test_table");
+		//db.insertDataTableNames("testtable", "El faro", "https://tripadvisor.es/elfaro");
 		
 		db.closeConnection();
 	}
