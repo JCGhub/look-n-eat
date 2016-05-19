@@ -196,11 +196,11 @@ public class DisplayInfo{
 		
 		System.out.println("Number of restaurants: "+dI.getMapNameURL().size());
 		
-		//dI.displayMapNameURL();
+		dI.displayMapNameURL();
 		
 		// *********************************** DATABASE ***********************************
 		
-		System.out.println("\nDATABASE");
+		/*System.out.println("\nDATABASE");
 		System.out.println("--------");
 		
 		ArrayList<String> xPath3 = new ArrayList<>();
@@ -212,7 +212,7 @@ public class DisplayInfo{
 		//dI.insertNameURL(nTable);
 		dI.insertComm(nTable, nTable2, xPath3);
 		
-		dI.closeConnectionDB();
+		dI.closeConnectionDB();*/
 		
 		
 		/*mapNameURL = dI.downloadNameURL();		

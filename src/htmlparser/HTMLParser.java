@@ -21,6 +21,7 @@ import org.htmlcleaner.TagNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import htmlparser.iLogger;
 import htmlparser.KeyValue;
@@ -122,17 +123,12 @@ public class HTMLParser{
                     for (int i = 0; i < nodes1.getLength(); i++) {
                     	String str = nodes1.item(i).getTextContent();
                     	
-                    	//String str2 = str.replaceAll("\n", "");
-                    	
                     	String str2 = str.replace("\n", "");
-                    	str = str2.replace("'", "\\'");
+                    	//str = str2.replace("'", "\\'");
                     	
-                        /*for (int x=0;x<str2.length();x++){
-                            System.out.print(str2.charAt(x) + " = " + str2.codePointAt(x)+", ");;
-                        }*/
-                        
-                        //System.out.print(str2.length()+", "+str2+", ");
-                        results.put(str, "https://www.tripadvisor.es"+nodes2.item(i).getTextContent());
+                    	String strCod = StringEscapeUtils.unescapeHtml4(str2);
+                    	
+                        results.put(strCod, "https://www.tripadvisor.es"+nodes2.item(i).getTextContent());
                     }
                 }
                 
