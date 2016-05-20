@@ -7,37 +7,21 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame{
 
 	private JPanel contentPane;
+	public static JComboBox<String> cBPortal;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainWindow frame = new MainWindow();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the frame.
-	 */
-	public MainWindow() {
+	public MainWindow(){
 		setTitle("Look'n'Eat Control Panel");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -46,7 +30,23 @@ public class MainWindow extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
+		cBPortal = new JComboBox<String>();
+		cBPortal.setModel(new DefaultComboBoxModel<String>(new String[] {"TripAdvisor", "11870"}));
+		cBPortal.setSelectedIndex(0);
+		cBPortal.setBounds(144, 50, 254, 20);
+		contentPane.add(cBPortal);
+		
 		JButton btnParser = new JButton("Parser");
+		btnParser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				final ParserWindow pW = new ParserWindow();
+				
+				JOptionPane.showMessageDialog(null, "You've chosen "+cBPortal.getSelectedItem().toString()+" to parse!");
+				
+				pW.setVisible(true);
+				dispose();
+			}
+		});
 		btnParser.setBounds(110, 164, 89, 23);
 		contentPane.add(btnParser);
 		
@@ -62,12 +62,6 @@ public class MainWindow extends JFrame {
 		JLabel lblPortal = new JLabel("Web portal:");
 		lblPortal.setBounds(30, 53, 89, 14);
 		contentPane.add(lblPortal);
-		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"TripAdvisor", "11870"}));
-		comboBox.setSelectedIndex(0);
-		comboBox.setBounds(144, 50, 254, 20);
-		contentPane.add(comboBox);
 		
 		JButton btnChangeData = new JButton("Change Data");
 		btnChangeData.setBounds(110, 130, 202, 23);

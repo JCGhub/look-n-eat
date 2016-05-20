@@ -44,12 +44,20 @@ public class DisplayInfo{
 		HTMLParser hP = new HTMLParser(URL, xPath3);
         arrayComm = hP.downloadAsArray();
         
+        // Seguramente, tras modificar HTMLParser para que nos devuelva una URL genérica,
+        // debamos añadir a la URL de cada restaurante el inicio de la ruta como hicimos
+        // al principio con TripAdvisor.
+        
         mapNameComm.put(key, arrayComm);
     }
 	
-	public String downloadNumPages(ArrayList<String> xPath3){
-		HTMLParser hP = new HTMLParser(mainURL, xPath3);
-		numPages = hP.downloadAsString();
+	public String downloadNumPages(ArrayList<String> xPath3, int n){
+		if(n == 1){
+			System.out.println("Counting pages of TripAdvisor...");
+			
+			HTMLParser hP = new HTMLParser(mainURL, xPath3);
+			numPages = hP.downloadAsString();
+		}
 		
 		return numPages;
 	}
@@ -120,13 +128,13 @@ public class DisplayInfo{
 		
 		try{
 			while(rSet.next()){
-				if(i < 5){
+				if(i < 5){ //Sólo los 5 primeros restaurantes, de manera provisional
 					System.out.println("Entrando en datos del restaurante "+i);
 			    if(mapNameURL.containsKey(rSet.getString("nRest"))){
 			    	String urlRest = mapNameURL.get(rSet.getString("nRest"));
 			    	
 			    	downloadComm(rSet.getString("nRest"), urlRest, xPath);
-			    	ArrayList<String> arrayComm = getArrayComm();
+			    	ArrayList<String> arrayComm = getArrayComm(); //Cogemos solo el array de comentarios actual
 			    	
 			    	//String idStr = Integer.toString(i);
 			    	
@@ -162,12 +170,15 @@ public class DisplayInfo{
 		//String URL = "https://www.tripadvisor.es/Restaurants-g187433-[[oaxx]]-Chiclana_de_la_Frontera_Costa_de_la_Luz_Andalucia.html";
 		String nTable = "test_table";
 		String nTable2 = "comm_ta";
+		int n;
 		
 		DisplayInfo dI = new DisplayInfo(xPath1, xPath2, URL);
 		
-		ArrayList<String> xPath4 = new ArrayList<>();
-		xPath4.add("//div[3]/div/div/a[6]/@data-page-number");
-		String numPagesStr = dI.downloadNumPages(xPath4);
+		ArrayList<String> xPath3 = new ArrayList<>();
+		xPath3.add("//div[3]/div/div/a[6]/@data-page-number");
+		n = 1;
+		
+		String numPagesStr = dI.downloadNumPages(xPath3, n);
 		int numPages = Integer.parseInt(numPagesStr);
 		
 		System.out.println("Number of pages on TripAdvisor: "+numPages);

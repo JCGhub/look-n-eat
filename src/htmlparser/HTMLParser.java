@@ -128,7 +128,7 @@ public class HTMLParser{
                     	
                     	String strCod = StringEscapeUtils.unescapeHtml4(str2);
                     	
-                        results.put(strCod, "https://www.tripadvisor.es"+nodes2.item(i).getTextContent());
+                        results.put(strCod, nodes2.item(i).getTextContent());
                     }
                 }
                 
