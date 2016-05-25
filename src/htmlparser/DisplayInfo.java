@@ -6,27 +6,112 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import javax.swing.JOptionPane;
+
 public class DisplayInfo{	
 	
 	Map<String, String> mapNameURL = new HashMap<String, String>();
 	Map<String, String> mapNameURL2 = new HashMap<String, String>();
 	Map<String, ArrayList<String>> mapNameComm = new HashMap<String, ArrayList<String>>();
 	ArrayList<String> arrayComm = new ArrayList<String>();
-	ArrayList<String> xPath1;
-	ArrayList<String> xPath2;
+	ArrayList<String> arrayInfo = new ArrayList<String>();
+	ArrayList<Integer> arrayVal = new ArrayList<Integer>();
+	ArrayList<String> xPathName = new ArrayList<String>();
+	ArrayList<String> xPathURL = new ArrayList<String>();
+	ArrayList<String> xPathPages = new ArrayList<String>();
+	ArrayList<String> xPathComm = new ArrayList<String>();
 	String mainURL;
-	String numPages = new String();
 	ConnectDB db = new ConnectDB();
-	int n = 1;
+	int nPortal, numPagesRest;
 	
-	public DisplayInfo(ArrayList<String> xPath1, ArrayList<String> xPath2, String mainURL){
-		this.xPath1 = xPath1;
-		this.xPath2 = xPath2;
-		this.mainURL = mainURL;
+	public DisplayInfo(int nPortal){
+		this.nPortal = nPortal;
+	}
+	
+	public void initializePortalParameters(){
+		switch(nPortal){
+		case 1:
+			xPathName.add("//a[@class='property_title']");
+			xPathURL.add("//div/div/h3/a/@href");
+			xPathPages.add("//div[3]/div/div/a[6]/@data-page-number");			
+			mainURL = "https://www.tripadvisor.es/Restaurants-g187432-[[oaxx]]-Cadiz_Costa_de_la_Luz_Andalucia.html";
+			break;
+		case 2:
+			xPathName.add("//h2[@class='card__title']/a");
+			xPathURL.add("//h2[@class='card__title']/a/@href");
+			xPathPages.add("");			
+			mainURL = "https://11870.com/k/restaurantes/es/es/cadiz?[[p=xx]]";		
+			break;
+		case 3:
+			xPathName.add("//a[@class='biz-name js-analytics-click']/span");
+			xPathURL.add("//a[@class='biz-name js-analytics-click']/@href");
+			xPathPages.add("");			
+			mainURL = "https://www.yelp.es/search?cflt=restaurants&find_loc=C%C3%A1diz%2C+Spain";		
+			break;
+		default:
+			JOptionPane.showMessageDialog(null, "You has not chosen any restaurant!");			
+			break;
+		}
+	}
+	
+	public void restPagination(){
+		int URLNumPatt;
+		String URLorigin, URLPatt, patt;
+		
+		switch(nPortal){
+		case 1:
+			downloadNumPagesRest(xPathPages, nPortal);
+			
+			URLNumPatt = 0;
+			URLorigin = mainURL;
+			URLPatt = "oa";
+			patt = "[[oaxx]]";
+			
+			for(int i = 0; i < numPagesRest; i++){
+				String newPatt = URLPatt+URLNumPatt;
+				String URLgen = URLorigin.replace(patt, newPatt);
+				
+				URLNumPatt = URLNumPatt + 30;
+				URLorigin = URLgen;
+				patt = newPatt;
+				
+				downloadNameURL(URLorigin);
+			}
+			
+			break;
+		case 2:
+			int pags = 6;
+			
+			URLNumPatt = 1;
+			URLorigin = mainURL;
+			URLPatt = "p=";
+			patt = "[[p=xx]]";
+			
+			for(int i = 0; i < pags; i++){
+				String newPatt = URLPatt+URLNumPatt;
+				String URLgen = URLorigin.replace(patt, newPatt);
+				
+				URLNumPatt++;
+				URLorigin = URLgen;
+				patt = newPatt;
+				
+				//System.out.println("Evaluando URL: "+URLorigin);
+				
+				downloadNameURL(URLorigin);
+			}
+			
+			break;
+		case 3:
+
+			break;
+		default:
+			JOptionPane.showMessageDialog(null, "You has not chosen any restaurant!");			
+			break;
+		}
 	}
 	
 	public void downloadNameURL(String URL){
-		HTMLParser hP = new HTMLParser(URL, xPath1, xPath2);
+		HTMLParser hP = new HTMLParser(URL, xPathName, xPathURL);
         mapNameURL2 = hP.downloadAsMap();
         
         for(String key : mapNameURL2.keySet()){
@@ -40,8 +125,8 @@ public class DisplayInfo{
         }
     }	
 	
-	public void downloadComm(String key, String URL, ArrayList<String> xPath3){
-		HTMLParser hP = new HTMLParser(URL, xPath3);
+	public void downloadComm(String key, String URL, ArrayList<String> xPathComm){
+		HTMLParser hP = new HTMLParser(URL, xPathComm);
         arrayComm = hP.downloadAsArray();
         
         // Seguramente, tras modificar HTMLParser para que nos devuelva una URL genérica,
@@ -51,22 +136,26 @@ public class DisplayInfo{
         mapNameComm.put(key, arrayComm);
     }
 	
-	public String downloadNumPages(ArrayList<String> xPath3, int n){
+	public void downloadNumPagesRest(ArrayList<String> xPathPages, int n){
+		String numPagesStr = "";
+		
 		if(n == 1){
 			System.out.println("Counting pages of TripAdvisor...");
 			
-			HTMLParser hP = new HTMLParser(mainURL, xPath3);
-			numPages = hP.downloadAsString();
+			HTMLParser hP = new HTMLParser(mainURL, xPathPages);
+			numPagesStr = hP.downloadAsString();
 		}
 		
-		return numPages;
+		numPagesRest = Integer.parseInt(numPagesStr);
 	}
 	
 	public void displayMapNameURL(){
 		if(mapNameURL.isEmpty()){
 			System.out.println("WARNING: The map is empty!");
 		}
-		else{			
+		else{
+			int n = 1;
+			
 			for(String key : mapNameURL.keySet()){
 			    System.out.println("\nRestaurante "+n+": "+key);
 			    
@@ -122,7 +211,7 @@ public class DisplayInfo{
 		}
 	}
 	
-	public void insertComm(String nTable, String nTable2, ArrayList<String> xPath){
+	public void insertComm(String nTable, String nTable2, ArrayList<String> xPathComm){
 		ResultSet rSet = db.getNames(nTable);
 		int i = 1;
 		
@@ -133,7 +222,7 @@ public class DisplayInfo{
 			    if(mapNameURL.containsKey(rSet.getString("nRest"))){
 			    	String urlRest = mapNameURL.get(rSet.getString("nRest"));
 			    	
-			    	downloadComm(rSet.getString("nRest"), urlRest, xPath);
+			    	downloadComm(rSet.getString("nRest"), urlRest, xPathComm);
 			    	ArrayList<String> arrayComm = getArrayComm(); //Cogemos solo el array de comentarios actual
 			    	
 			    	//String idStr = Integer.toString(i);
@@ -154,58 +243,48 @@ public class DisplayInfo{
 	}
 	
 	public Map<String, String> getMapNameURL(){
-		return this.mapNameURL;
+		return mapNameURL;
 	}
 	
 	public ArrayList<String> getArrayComm(){
-		return this.arrayComm;
+		return arrayComm;
+	}
+	
+	public int getNumPagesRest(){
+		return numPagesRest;
+	}
+	
+	public int getNumRestaurants(){
+		return getMapNameURL().size();
 	}
 	
 	public static void main(String[] args) throws Exception{
-		ArrayList<String> xPath1 = new ArrayList<>();
-		ArrayList<String> xPath2 = new ArrayList<>();
-		xPath1.add("//a[@class='property_title']");
-		xPath2.add("//div/div/h3/a/@href");
-		String URL = "https://www.tripadvisor.es/Restaurants-g187432-[[oaxx]]-Cadiz_Costa_de_la_Luz_Andalucia.html";
-		//String URL = "https://www.tripadvisor.es/Restaurants-g187433-[[oaxx]]-Chiclana_de_la_Frontera_Costa_de_la_Luz_Andalucia.html";
-		String nTable = "test_table";
-		String nTable2 = "comm_ta";
-		int n;
+		String opt = "TripAdvisor";
+		int nPortal;
 		
-		DisplayInfo dI = new DisplayInfo(xPath1, xPath2, URL);
+		if(opt == "TripAdvisor"){
+			nPortal = 1;
+		}
+		else{
+			if(opt == "11870"){
+				nPortal = 2;
+			}
+			else{
+				nPortal = 3;
+			}
+		}
 		
-		ArrayList<String> xPath3 = new ArrayList<>();
-		xPath3.add("//div[3]/div/div/a[6]/@data-page-number");
-		n = 1;
-		
-		String numPagesStr = dI.downloadNumPages(xPath3, n);
-		int numPages = Integer.parseInt(numPagesStr);
-		
-		System.out.println("Number of pages on TripAdvisor: "+numPages);
+		DisplayInfo dI = new DisplayInfo(nPortal);
 		
 		// *********************************** RESTAURANTS ***********************************
 		
-		//System.out.println("\nRESTAURANTS");
-		//System.out.println("-----------");
+		System.out.println("\nRESTAURANTS");
+		System.out.println("-----------");
 		
-		int URLNumPatt = 0;
-		String URLPatt = "oa";
-		String patt = "[[oaxx]]";
+		dI.initializePortalParameters();
+		dI.restPagination();
 		
-		for(int i = 0; i < numPages; i++){
-			String newPatt = URLPatt+URLNumPatt;
-			String URLgen = URL.replace(patt, newPatt);
-			
-			URLNumPatt = URLNumPatt + 30;
-			URL = URLgen;
-			patt = newPatt;
-			
-			dI.downloadNameURL(URL);
-			//System.out.println("\n"+URL);
-			//dI.displayMapNameURL();
-		}
-		
-		System.out.println("Number of restaurants: "+dI.getMapNameURL().size());
+		JOptionPane.showMessageDialog(null, "In "+opt+" there are "+dI.getNumPagesRest()+" pages and "+dI.getNumRestaurants()+" restaurants!");
 		
 		dI.displayMapNameURL();
 		
@@ -214,14 +293,17 @@ public class DisplayInfo{
 		/*System.out.println("\nDATABASE");
 		System.out.println("--------");
 		
-		ArrayList<String> xPath3 = new ArrayList<>();
-		xPath3.add("//div[2]/div/div/div[3]/p");
+		String nTable = "test_table";
+		String nTable2 = "comm_ta";
+		
+		ArrayList<String> xPathComm = new ArrayList<>();
+		xPathComm.add("//div[2]/div/div/div[3]/p");
 		
 		dI.startConnectionDB();
 		
 		//dI.createTableNames(nTable);
 		//dI.insertNameURL(nTable);
-		dI.insertComm(nTable, nTable2, xPath3);
+		dI.insertComm(nTable, nTable2, xPathComm);
 		
 		dI.closeConnectionDB();*/
 		
@@ -234,28 +316,16 @@ public class DisplayInfo{
 		/*System.out.println("\nCOMMENTS");
 		System.out.println("--------");
 		
-		ArrayList<String> xPath3 = new ArrayList<>();
-		xPath3.add("//div[2]/div/div/div[3]/p");
+		ArrayList<String> xPathComm = new ArrayList<>();
+		xPathComm.add("//div[2]/div/div/div[3]/p");
 		
 		Map<String, String> mapNameURL = new HashMap<String, String>();
 		mapNameURL = dI.getMapNameURL();
 		
-		/*for(String key : mapNameURL.keySet()){
+		for(String key : mapNameURL.keySet()){
 			String urlRest = (String)mapNameURL.get(key);
 			
-		    dI.downloadComm(key, urlRest, xPath3);
+		    dI.downloadComm(key, urlRest, xPathComm);
 		}*/
-		
-		/*String key = "BarraSie7e";
-		
-		if(mapNameURL.containsKey(key)){
-			System.out.println("The restaurant "+key+" exists!");
-			
-			String urlRest = (String)mapNameURL.get(key);
-			
-		    dI.downloadComm(key, urlRest, xPath3);
-		}
-		
-		dI.displayMapCommByIndex(key);*/
 	}
 }
