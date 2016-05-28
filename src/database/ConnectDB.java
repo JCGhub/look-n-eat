@@ -59,9 +59,9 @@ public class ConnectDB{
             		+ "PRIMARY KEY(idRest))"
             		+ "ENGINE=InnoDB DEFAULT CHARSET=latin1";
             
-            JOptionPane.showMessageDialog(null, "The table " + name + " has been created successfully!");
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);
+            JOptionPane.showMessageDialog(null, "The table " + name + " has been created successfully!");
         } catch (SQLException ex) {
             Logger.getLogger(ConnectDB.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -76,9 +76,9 @@ public class ConnectDB{
             		+ "PRIMARY KEY(idComm))"
             		+ "ENGINE=InnoDB DEFAULT CHARSET=latin1";
             
-            JOptionPane.showMessageDialog(null, "The table " + name + " has been created successfully!");
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);
+            JOptionPane.showMessageDialog(null, "The table " + name + " has been created successfully!");
         } catch (SQLException ex) {
             Logger.getLogger(ConnectDB.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -91,14 +91,14 @@ public class ConnectDB{
             
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);
-            //JOptionPane.showMessageDialog(null, "Datos almacenados de forma exitosa");
+            JOptionPane.showMessageDialog(null, "Data names inserted successfully!");
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Error en el almacenamiento de datos del restaurante "+nRest);
         }
     }
     
     public void insertDataTableComm(String tName, int idRest, String comm){
-    	//System.out.println("Entrando en función de inserción en BD");
+    	//System.out.println("Entrando en funciï¿½n de inserciï¿½n en BD");
         try {
             String Query = "INSERT INTO "+tName+" (idComm, idRest, ctext) "
             		+ "VALUES (NULL, '"+idRest+"', '"+comm+"');";
@@ -107,7 +107,7 @@ public class ConnectDB{
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);
             //System.out.println("Query ejecutada en BD");
-            //JOptionPane.showMessageDialog(null, "Datos almacenados de forma exitosa");
+            JOptionPane.showMessageDialog(null, "Data comments inserted successfully!");
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Error en el almacenamiento de comentarios de restaurante");
         }
@@ -123,7 +123,7 @@ public class ConnectDB{
             rSet = st.executeQuery(Query);
  
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error en la adquisición de datos");
+            JOptionPane.showMessageDialog(null, "Error en la adquisiciï¿½n de datos");
         }
         
         return rSet;
@@ -131,11 +131,11 @@ public class ConnectDB{
     
     public void deleteTable(String name) {
         try {
-            String Query = "DELETE TABLE "+ name + "";
+            String Query = "DROP TABLE "+ name + "";
             
-            JOptionPane.showMessageDialog(null, "The table " + name + " has been deleted successfully!");
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);
+            JOptionPane.showMessageDialog(null, "The table " + name + " has been deleted successfully!");
         } catch (SQLException ex) {
             Logger.getLogger(ConnectDB.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -9,6 +9,7 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.net.HttpURLConnection;
 import javax.net.ssl.HttpsURLConnection;
+import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -107,7 +108,7 @@ public class HTMLParser{
         	Map<String, String> results = new HashMap<String, String>();
             
             try {
-                TagNode tagNode = new HtmlCleaner().clean(doRequest().toString());
+            	TagNode tagNode = new HtmlCleaner().clean(doRequest().toString());
                 doc = new DomSerializer(new CleanerProperties()).createDOM(tagNode);
                 
                 XPath xpath1 = XPathFactory.newInstance().newXPath();
@@ -235,40 +236,49 @@ public class HTMLParser{
         }
         
         int responseCode = con.getResponseCode();
+        
+        //***** Si la URL existe (responseCode = 200), devolvemos response como el código html *****
+        
         StringBuffer response = new StringBuffer();
         
-        logger.log("Response: " + responseCode, iLogger.Level.INFO);
-
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        
-        if(bytes < 0) {        
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine + "\n");
-                //logger.log(inputLine);
-            }
-        } else {
-            char[] array = new char[bytes];            
-            int read = in.read(array);
-            response.append(array);
-            
-            if(read < bytes) {
-                logger.log("Waring: expecting " + bytes + " bytes at least but received " + read, iLogger.Level.INFO);
-            }
-        }
-        
-        in.close();
-        
-        logger.log("\nResponse header:", iLogger.Level.DEBUG);
-        int i = 0;
-        while(con.getHeaderField(i) != null) {
-            responseProperties.add(new KeyValue(con.getHeaderFieldKey(i), con.getHeaderField(i)));
-            logger.log("\n"+ con.getHeaderFieldKey(i) +": " + con.getHeaderField(i), iLogger.Level.DEBUG);
-            ++i;
-        }
-        
-        logger.log("\n" + response, iLogger.Level.DEBUG);
+        //if(responseCode == 200){
+	    logger.log("Response: " + responseCode, iLogger.Level.INFO);
+	
+	    BufferedReader in = new BufferedReader(
+	            new InputStreamReader(con.getInputStream()));
+	        
+	    if(bytes < 0) {        
+	        String inputLine;
+	        while ((inputLine = in.readLine()) != null) {
+	            response.append(inputLine + "\n");
+	            //logger.log(inputLine);
+	        }
+	    } else {
+	        char[] array = new char[bytes];            
+	        int read = in.read(array);
+	        response.append(array);
+	            
+	        if(read < bytes) {
+	            logger.log("Waring: expecting " + bytes + " bytes at least but received " + read, iLogger.Level.INFO);
+	        }
+	    }
+	        
+	    in.close();
+	        
+	    logger.log("\nResponse header:", iLogger.Level.DEBUG);
+	    int i = 0;
+	    while(con.getHeaderField(i) != null) {
+	        responseProperties.add(new KeyValue(con.getHeaderFieldKey(i), con.getHeaderField(i)));
+	        logger.log("\n"+ con.getHeaderFieldKey(i) +": " + con.getHeaderField(i), iLogger.Level.DEBUG);
+	        ++i;
+	    }
+	        
+	    logger.log("\n" + response, iLogger.Level.DEBUG);
+        /*}
+        else{
+        	response.append("");
+        	JOptionPane.showMessageDialog(null, "404 Error! Page not found!\nYou has tried to connect to an non-existent URL!\n\n("+url+")");
+        }*/
         
         return response;
     }
