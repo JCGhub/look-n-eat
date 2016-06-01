@@ -70,7 +70,7 @@ public class DatabaseWindow extends JFrame{
 				db.createTableNames(dI.table_names);
 			}
 		});
-		btnCreateNamesTables.setBounds(24, 111, 175, 23);
+		btnCreateNamesTables.setBounds(24, 111, 100, 23);
 		contentPane.add(btnCreateNamesTables);
 		
 		JButton btnCreateCommentsTable = new JButton("Create comments table");
@@ -79,16 +79,16 @@ public class DatabaseWindow extends JFrame{
 				db.createTableComm(dI.table_comm);
 			}
 		});
-		btnCreateCommentsTable.setBounds(231, 111, 175, 23);
+		btnCreateCommentsTable.setBounds(306, 111, 100, 23);
 		contentPane.add(btnCreateCommentsTable);
 		
 		JButton btnInsertNames = new JButton("Insert names");
 		btnInsertNames.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
 				dI.insertNameURL(db);
 			}
 		});
-		btnInsertNames.setBounds(24, 145, 175, 23);
+		btnInsertNames.setBounds(24, 145, 100, 23);
 		contentPane.add(btnInsertNames);
 		
 		JButton btnInsertComments = new JButton("Insert comments");
@@ -97,7 +97,7 @@ public class DatabaseWindow extends JFrame{
 				dI.insertComm(db);
 			}
 		});
-		btnInsertComments.setBounds(231, 145, 175, 23);
+		btnInsertComments.setBounds(306, 145, 100, 23);
 		contentPane.add(btnInsertComments);
 		
 		JButton btnEraseNames = new JButton("Erase names");
@@ -106,7 +106,7 @@ public class DatabaseWindow extends JFrame{
 				db.deleteTable(dI.table_names);
 			}
 		});
-		btnEraseNames.setBounds(24, 179, 175, 23);
+		btnEraseNames.setBounds(24, 179, 100, 23);
 		contentPane.add(btnEraseNames);
 		
 		JButton btnEraseComments = new JButton("Erase comments");
@@ -115,8 +115,35 @@ public class DatabaseWindow extends JFrame{
 				db.deleteTable(dI.table_comm);
 			}
 		});
-		btnEraseComments.setBounds(231, 179, 175, 23);
+		btnEraseComments.setBounds(306, 179, 100, 23);
 		contentPane.add(btnEraseComments);
+		
+		JButton btnCreateInfoTables = new JButton("Create info tables");
+		btnCreateInfoTables.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				db.createTableInfo(dI.table_info);
+			}
+		});
+		btnCreateInfoTables.setBounds(164, 111, 100, 23);
+		contentPane.add(btnCreateInfoTables);
+		
+		JButton btnInsertInfo = new JButton("Insert info");
+		btnInsertInfo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dI.insertInfo(db);
+			}
+		});
+		btnInsertInfo.setBounds(164, 145, 100, 23);
+		contentPane.add(btnInsertInfo);
+		
+		JButton btnEraseInfo = new JButton("Erase info");
+		btnEraseInfo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				db.deleteTable(dI.table_info);
+			}
+		});
+		btnEraseInfo.setBounds(164, 179, 100, 23);
+		contentPane.add(btnEraseInfo);
 		
 		JButton btnExit = new JButton("Exit");
 		btnExit.addActionListener(new ActionListener() {

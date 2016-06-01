@@ -14,13 +14,16 @@ public class DisplayInfo{
 	Map<String, String> mapNameURL2 = new HashMap<String, String>();
 	Map<String, ArrayList<String>> mapNameComm = new HashMap<String, ArrayList<String>>();
 	ArrayList<String> arrayComm = new ArrayList<String>();
-	ArrayList<String> arrayInfo = new ArrayList<String>();
+	//ArrayList<String> arrayInfo = new ArrayList<String>();
 	ArrayList<Integer> arrayVal = new ArrayList<Integer>();
 	ArrayList<String> xPathName = new ArrayList<String>();
 	ArrayList<String> xPathURL = new ArrayList<String>();
 	ArrayList<String> xPathPages = new ArrayList<String>();
 	ArrayList<String> xPathComm = new ArrayList<String>();
-	public String mainURL, table_names, table_comm, namePortal;
+	ArrayList<String> xPathNumComm = new ArrayList<String>();
+	ArrayList<String> xPathVal = new ArrayList<String>();
+	ArrayList<String> xPathAddress = new ArrayList<String>();
+	public String mainURL, table_names, table_comm, table_info, namePortal;
 	int nPortal, numPagesRest;
 	
 	public DisplayInfo(int nPortal){
@@ -35,9 +38,13 @@ public class DisplayInfo{
 			xPathURL.add("//div/div/h3/a/@href");
 			xPathPages.add("//div[3]/div/div/a[6]/@data-page-number");
 			xPathComm.add("//div[2]/div/div/div[3]/p");
+			xPathNumComm.add("//div[@class='rs rating']/a/@content");
+			xPathVal.add("//span[@class='rate sprite-rating_rr rating_rr']/img/@content");
+			xPathAddress.add("//span[@property='streetAddress']");
 			mainURL = "https://www.tripadvisor.es/Restaurants-g187432-[[oaxx]]-Cadiz_Costa_de_la_Luz_Andalucia.html";
 			table_names = "rest_ta";
 			table_comm = "comm_ta";
+			table_info = "info_ta";
 			
 			break;
 		case 2:
@@ -51,14 +58,18 @@ public class DisplayInfo{
 			
 			break;
 		case 3:
-			namePortal = "Yelp!";
+			namePortal = "Yelp";
 			xPathName.add("//a[@class='biz-name js-analytics-click']/span");
 			xPathURL.add("//a[@class='biz-name js-analytics-click']/@href");
 			xPathPages.add("//div[@class='page-of-pages arrange_unit arrange_unit--fill']");
 			xPathComm.add("//div[@class='review-content']/p");
+			xPathNumComm.add("//span[@itemprop='reviewCount']");
+			xPathVal.add("//div[@class='biz-page-header-left']/div/div/div/div[@class='rating-very-large']/i/@title");
+			xPathAddress.add("//span[@itemprop='streetAddress']");
 			mainURL = "https://www.yelp.es/search?cflt=restaurants&l=p%3AES-CA%3AC%C3%A1diz%3A%3A&find_loc=C%C3%A1diz%2C+Spain&[[start=xx]]";		
 			table_names = "rest_ye";
 			table_comm = "comm_ye";
+			table_info = "info_ye";
 			
 			break;
 		default:
@@ -160,6 +171,33 @@ public class DisplayInfo{
            
         mapNameComm.put(key, arrayComm);
     }
+	
+	public String downloadNumComm(String key, String URL){
+		String str;
+		
+		HTMLParser hP = new HTMLParser(URL, xPathNumComm);
+		str = hP.downloadAsString();
+		
+		return str;
+	}
+	
+	public String downloadVal(String key, String URL){
+		String str;
+		
+		HTMLParser hP = new HTMLParser(URL, xPathVal);
+		str = hP.downloadAsString();
+		
+		return str;
+	}
+	
+	public String downloadAddress(String key, String URL){
+		String str;
+		
+		HTMLParser hP = new HTMLParser(URL, xPathAddress);
+		str = hP.downloadAsString();
+		
+		return str;
+	}
 	
 	public void downloadNumPagesRest(ArrayList<String> xPathPages){
 		String numPagesStr = "";		
@@ -268,6 +306,38 @@ public class DisplayInfo{
 				    
 				    i++;
 				}
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void insertInfo(ConnectDB db){
+		ResultSet rSet = db.getNames(table_names);
+		int i = 1;
+		
+		try{
+			while(rSet.next()){
+				if(mapNameURL.containsKey(rSet.getString("nRest"))){
+				    String urlRest = mapNameURL.get(rSet.getString("nRest"));
+				    	
+				    if(nPortal == 1){
+				    	urlRest = "https://www.tripadvisor.es" + urlRest;
+				    }
+			    	if(nPortal == 3){
+			    		urlRest = "https://www.yelp.es" + urlRest;
+			    	}
+			    	
+			    	ArrayList<String> arrayVal = new ArrayList<String>();
+			    	
+			    	arrayVal.add(downloadNumComm(rSet.getString("nRest"),urlRest));
+			    	arrayVal.add(downloadVal(rSet.getString("nRest"),urlRest));
+			    	arrayVal.add(downloadAddress(rSet.getString("nRest"),urlRest));
+			    	
+			    	db.insertDataTableInfo(table_info, i, arrayVal.get(0), arrayVal.get(1), arrayVal.get(2));
+				}
+				
+				i++;
 			}
 		}catch(SQLException e){
 			e.printStackTrace();

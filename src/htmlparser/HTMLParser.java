@@ -35,8 +35,7 @@ public class HTMLParser{
     
 	String URL;
 	ArrayList<KeyValue> parameters;
-	ArrayList<String> xPath1;
-	ArrayList<String> xPath2;
+	ArrayList<String> xPath1, xPath2;
 	ArrayList<KeyValue> requestProperties = new ArrayList<KeyValue>();
 	ArrayList<KeyValue> responseProperties = new ArrayList<KeyValue>();
 	private iLogger logger = null;
@@ -122,11 +121,9 @@ public class HTMLParser{
                     j++;
                     
                     for (int i = 0; i < nodes1.getLength(); i++) {
-                    	String str = nodes1.item(i).getTextContent();
-                    	
+                    	String str = nodes1.item(i).getTextContent();                    	
                     	String str2 = str.replace("\n", "");
-                    	//str = str2.replace("'", "\\'");
-                    	
+                    	//str = str2.replace("'", "\\'");                    	
                     	String strCod = StringEscapeUtils.unescapeHtml4(str2);
                     	
                         results.put(strCod, nodes2.item(i).getTextContent());

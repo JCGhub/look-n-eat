@@ -84,6 +84,25 @@ public class ConnectDB{
         }
     }
     
+    public void createTableInfo(String name){
+        try {
+            String Query = "CREATE TABLE "+ name + ""
+            		+ "(idInfo int(255) NOT NULL AUTO_INCREMENT, "
+            		+ "idRest int(255) NOT NULL, "
+            		+ "nComm text, "
+            		+ "valoration text, "
+            		+ "address text, "
+            		+ "PRIMARY KEY(idInfo))"
+            		+ "ENGINE=InnoDB DEFAULT CHARSET=latin1";
+            
+            Statement st = Conn.createStatement();
+            st.executeUpdate(Query);
+            JOptionPane.showMessageDialog(null, "The table " + name + " has been created successfully!");
+        } catch (SQLException ex) {
+            Logger.getLogger(ConnectDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public void insertDataTableNames(String tName, String nRest, String urlRest){
         try {
             String Query = "INSERT INTO "+tName+" (idRest, nRest, urlRest, idComm, idVal, idInfo) "
@@ -91,25 +110,35 @@ public class ConnectDB{
             
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);
-            JOptionPane.showMessageDialog(null, "Data names inserted successfully!");
+            //JOptionPane.showMessageDialog(null, "Data names inserted successfully!");
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error en el almacenamiento de datos del restaurante "+nRest);
+            //JOptionPane.showMessageDialog(null, "Error en el almacenamiento de datos del restaurante "+nRest);
         }
     }
     
     public void insertDataTableComm(String tName, int idRest, String comm){
-    	//System.out.println("Entrando en funci�n de inserci�n en BD");
         try {
             String Query = "INSERT INTO "+tName+" (idComm, idRest, ctext) "
             		+ "VALUES (NULL, '"+idRest+"', '"+comm+"');";
             
-            //System.out.println("Query creada");
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);
-            //System.out.println("Query ejecutada en BD");
-            JOptionPane.showMessageDialog(null, "Data comments inserted successfully!");
+            //JOptionPane.showMessageDialog(null, "Data comments inserted successfully!");
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error en el almacenamiento de comentarios de restaurante");
+            //JOptionPane.showMessageDialog(null, "Error en el almacenamiento de comentarios de restaurante");
+        }
+    }
+    
+    public void insertDataTableInfo(String tName, int idRest, String nComm, String valoration, String address){
+        try {
+            String Query = "INSERT INTO "+tName+" (idInfo, idRest, nComm, valoration, address) "
+            		+ "VALUES (NULL, '"+idRest+"', '"+nComm+"', '"+valoration+"', '"+address+"');";
+            
+            Statement st = Conn.createStatement();
+            st.executeUpdate(Query);
+            //JOptionPane.showMessageDialog(null, "Data comments inserted successfully!");
+        } catch (SQLException ex) {
+            //JOptionPane.showMessageDialog(null, "Error en el almacenamiento de comentarios de restaurante");
         }
     }
     
