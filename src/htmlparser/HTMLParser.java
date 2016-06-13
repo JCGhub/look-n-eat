@@ -44,6 +44,7 @@ public class HTMLParser{
 	boolean https = false;
 	int connectTimeout = 10000; // 10 seconds by default
 	boolean encode = true;
+	private DataFixer dF;
     
 
 	public HTMLParser(String URL) {
@@ -83,7 +84,10 @@ public class HTMLParser{
                     NodeList nodes = (NodeList) xpath.evaluate(path, getDoc(), XPathConstants.NODESET);
 
                     for (int i = 0; i < nodes.getLength(); i++) {
-                        results.add(nodes.item(i).getTextContent());
+                    	String str = nodes.item(i).getTextContent();
+                    	String strCod = StringEscapeUtils.unescapeHtml4(str);
+                    	
+                        results.add(strCod);
                     }
                 }
                 
@@ -102,7 +106,7 @@ public class HTMLParser{
         return null;     
     }
 	
-	public Map<String, String> downloadAsMap() {
+	public Map<String, String> downloadAsMap(String namePortal) {
         if(xPath1.size() > 0) {
         	Map<String, String> results = new HashMap<String, String>();
             
@@ -122,8 +126,7 @@ public class HTMLParser{
                     
                     for (int i = 0; i < nodes1.getLength(); i++) {
                     	String str = nodes1.item(i).getTextContent();                    	
-                    	String str2 = str.replace("\n", "");
-                    	//str = str2.replace("'", "\\'");                    	
+                    	String str2 = str.replace("\n", "");                 	
                     	String strCod = StringEscapeUtils.unescapeHtml4(str2);
                     	
                         results.put(strCod, nodes2.item(i).getTextContent());
@@ -145,9 +148,9 @@ public class HTMLParser{
         return null;     
     }
 	
-	public String downloadAsString(){
+	public String downloadAsString(String namePortal, String data){
         if(xPath1.size() > 0) {
-        	String result = new String();
+        	String result, resultCod = "", comma = "";
             
             try {
                 TagNode tagNode = new HtmlCleaner().clean(doRequest().toString());
@@ -159,10 +162,41 @@ public class HTMLParser{
 
                     for (int i = 0; i < nodes.getLength(); i++) {
                         result = nodes.item(i).getTextContent();
+                        
+                        if(data == "coord"){
+                        	resultCod = resultCod+comma+result;
+                            resultCod = StringEscapeUtils.unescapeHtml4(resultCod);
+                            comma = ", ";
+                        }
+                        else{
+                        	resultCod = StringEscapeUtils.unescapeHtml4(result);
+                        }
+                    }
+                    
+                    dF = new DataFixer(namePortal);
+                    
+                    switch(data){
+                    case "val":
+                    	resultCod = dF.fixVal(resultCod);
+                    	break;
+                    case "address":
+                    	resultCod = dF.fixAddress(resultCod);
+                    	break;
+                    case "numPagesRest":
+                    	resultCod = dF.fixNumPages(resultCod);
+                    	break;
+                    case "tel":
+                    	resultCod = dF.fixTel(resultCod);
+                    	break;
+                    case "coord":
+                    	resultCod = dF.fixCoord(resultCod);
+                    	break;
+                    default:
+                    	break;
                     }
                 }
                 
-                return result;
+                return resultCod;
             } catch (XPathExpressionException e) {
                     e.printStackTrace();
                     logger.log(e.getMessage());

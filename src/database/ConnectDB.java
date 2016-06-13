@@ -92,6 +92,8 @@ public class ConnectDB{
             		+ "nComm text, "
             		+ "valoration text, "
             		+ "address text, "
+            		+ "tel text, "
+            		+ "coord text, "
             		+ "PRIMARY KEY(idInfo))"
             		+ "ENGINE=InnoDB DEFAULT CHARSET=latin1";
             
@@ -129,10 +131,10 @@ public class ConnectDB{
         }
     }
     
-    public void insertDataTableInfo(String tName, int idRest, String nComm, String valoration, String address){
+    public void insertDataTableInfo(String tName, int idRest, String nComm, String valoration, String address, String tel, String coord){
         try {
-            String Query = "INSERT INTO "+tName+" (idInfo, idRest, nComm, valoration, address) "
-            		+ "VALUES (NULL, '"+idRest+"', '"+nComm+"', '"+valoration+"', '"+address+"');";
+            String Query = "INSERT INTO "+tName+" (idInfo, idRest, nComm, valoration, address, tel, coord) "
+            		+ "VALUES (NULL, '"+idRest+"', '"+nComm+"', '"+valoration+"', '"+address+"', '"+tel+"', '"+coord+"');";
             
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);

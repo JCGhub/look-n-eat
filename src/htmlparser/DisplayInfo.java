@@ -14,7 +14,6 @@ public class DisplayInfo{
 	Map<String, String> mapNameURL2 = new HashMap<String, String>();
 	Map<String, ArrayList<String>> mapNameComm = new HashMap<String, ArrayList<String>>();
 	ArrayList<String> arrayComm = new ArrayList<String>();
-	//ArrayList<String> arrayInfo = new ArrayList<String>();
 	ArrayList<Integer> arrayVal = new ArrayList<Integer>();
 	ArrayList<String> xPathName = new ArrayList<String>();
 	ArrayList<String> xPathURL = new ArrayList<String>();
@@ -22,7 +21,9 @@ public class DisplayInfo{
 	ArrayList<String> xPathComm = new ArrayList<String>();
 	ArrayList<String> xPathNumComm = new ArrayList<String>();
 	ArrayList<String> xPathVal = new ArrayList<String>();
+	ArrayList<String> xPathTel = new ArrayList<String>();
 	ArrayList<String> xPathAddress = new ArrayList<String>();
+	ArrayList<String> xPathCoord = new ArrayList<String>();
 	public String mainURL, table_names, table_comm, table_info, namePortal;
 	int nPortal, numPagesRest;
 	
@@ -40,7 +41,9 @@ public class DisplayInfo{
 			xPathComm.add("//div[2]/div/div/div[3]/p");
 			xPathNumComm.add("//div[@class='rs rating']/a/@content");
 			xPathVal.add("//span[@class='rate sprite-rating_rr rating_rr']/img/@content");
+			xPathTel.add("//div[@class='fl phoneNumber']");
 			xPathAddress.add("//span[@property='streetAddress']");
+			xPathCoord.add("//div[@class='mapContainer']/@*[name()='data-lng' or name()='data-lat']");
 			mainURL = "https://www.tripadvisor.es/Restaurants-g187432-[[oaxx]]-Cadiz_Costa_de_la_Luz_Andalucia.html";
 			table_names = "rest_ta";
 			table_comm = "comm_ta";
@@ -48,13 +51,13 @@ public class DisplayInfo{
 			
 			break;
 		case 2:
-			namePortal = "11870";
+			/*namePortal = "11870";
 			xPathName.add("//h2[@class='card__title']/a");
 			xPathURL.add("//h2[@class='card__title']/a/@href");
 			xPathPages.add("");
 			mainURL = "https://11870.com/k/restaurantes/es/es/cadiz?[[p=xx]]";
 			table_names = "rest_11";
-			table_comm = "comm_11";
+			table_comm = "comm_11";*/
 			
 			break;
 		case 3:
@@ -65,7 +68,9 @@ public class DisplayInfo{
 			xPathComm.add("//div[@class='review-content']/p");
 			xPathNumComm.add("//span[@itemprop='reviewCount']");
 			xPathVal.add("//div[@class='biz-page-header-left']/div/div/div/div[@class='rating-very-large']/i/@title");
+			xPathTel.add("//span[@class='biz-phone']");
 			xPathAddress.add("//span[@itemprop='streetAddress']");
+			xPathCoord.add("//div[@class='mapbox-map']/a/img/@src");
 			mainURL = "https://www.yelp.es/search?cflt=restaurants&l=p%3AES-CA%3AC%C3%A1diz%3A%3A&find_loc=C%C3%A1diz%2C+Spain&[[start=xx]]";		
 			table_names = "rest_ye";
 			table_comm = "comm_ye";
@@ -153,7 +158,7 @@ public class DisplayInfo{
 	
 	public void downloadNameURL(String URL){
 		HTMLParser hP = new HTMLParser(URL, xPathName, xPathURL);
-        mapNameURL2 = hP.downloadAsMap();
+        mapNameURL2 = hP.downloadAsMap(namePortal);
         
         for(String key : mapNameURL2.keySet()){
         	if(mapNameURL.containsKey(key)){
@@ -176,7 +181,7 @@ public class DisplayInfo{
 		String str;
 		
 		HTMLParser hP = new HTMLParser(URL, xPathNumComm);
-		str = hP.downloadAsString();
+		str = hP.downloadAsString(namePortal, "numComm");
 		
 		return str;
 	}
@@ -185,7 +190,7 @@ public class DisplayInfo{
 		String str;
 		
 		HTMLParser hP = new HTMLParser(URL, xPathVal);
-		str = hP.downloadAsString();
+		str = hP.downloadAsString(namePortal, "val");
 		
 		return str;
 	}
@@ -194,37 +199,37 @@ public class DisplayInfo{
 		String str;
 		
 		HTMLParser hP = new HTMLParser(URL, xPathAddress);
-		str = hP.downloadAsString();
+		str = hP.downloadAsString(namePortal, "address");
+		
+		return str;
+	}
+	
+	public String downloadTel(String key, String URL){
+		String str;
+		
+		HTMLParser hP = new HTMLParser(URL, xPathTel);
+		str = hP.downloadAsString(namePortal, "tel");
+		
+		return str;
+	}
+	
+	public String downloadCoord(String key, String URL){
+		String str;
+		
+		HTMLParser hP = new HTMLParser(URL, xPathCoord);
+		str = hP.downloadAsString(namePortal, "coord");
 		
 		return str;
 	}
 	
 	public void downloadNumPagesRest(ArrayList<String> xPathPages){
-		String numPagesStr = "";		
+		String numPagesStr;		
 		HTMLParser hP = new HTMLParser(mainURL, xPathPages);
 		
-		switch(nPortal){
-		case 1:
-			System.out.println("Counting pages of TripAdvisor...");
+		System.out.println("Counting pages of "+namePortal+"...");
 			
-			numPagesStr = hP.downloadAsString();			
-			numPagesRest = Integer.parseInt(numPagesStr);
-			
-			break;
-		case 3:
-			System.out.println("Counting pages of Yelp...");
-			
-			numPagesStr = hP.downloadAsString();
-			String numPagesStrAux = numPagesStr.replace(" ", "");
-			numPagesStr = numPagesStrAux.replace("P&aacute;gina1de", "");
-			numPagesStrAux = numPagesStr.replace("\n", "");
-			
-			numPagesRest = Integer.parseInt(numPagesStrAux);
-			
-			break;
-		default:
-			break;
-		}
+		numPagesStr = hP.downloadAsString(namePortal, "numPagesRest");			
+		numPagesRest = Integer.parseInt(numPagesStr);
 	}
 	
 	public void displayMapNameURL(){
@@ -333,8 +338,10 @@ public class DisplayInfo{
 			    	arrayVal.add(downloadNumComm(rSet.getString("nRest"),urlRest));
 			    	arrayVal.add(downloadVal(rSet.getString("nRest"),urlRest));
 			    	arrayVal.add(downloadAddress(rSet.getString("nRest"),urlRest));
+			    	arrayVal.add(downloadTel(rSet.getString("nRest"),urlRest));
+			    	arrayVal.add(downloadCoord(rSet.getString("nRest"),urlRest));
 			    	
-			    	db.insertDataTableInfo(table_info, i, arrayVal.get(0), arrayVal.get(1), arrayVal.get(2));
+			    	db.insertDataTableInfo(table_info, i, arrayVal.get(0), arrayVal.get(1), arrayVal.get(2), arrayVal.get(3), arrayVal.get(4));
 				}
 				
 				i++;
