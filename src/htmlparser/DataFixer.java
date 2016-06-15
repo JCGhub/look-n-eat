@@ -7,13 +7,53 @@ import java.util.regex.*;
 
 public class DataFixer{
 	private String namePortal;
+	private String comArt[] = {"el","la","los","las","lo","de","del","the"};
 	
 	public DataFixer(String namePortal){
 		this.namePortal = namePortal;
 	}
 	
-	public void fixName(String str){
+	public String fixName(String str){
+		String str1 = "", str2, res = "";
+		Pattern patt;
+		Matcher matStr;
+		boolean aux = false;
 		
+		switch(namePortal){
+		case "TripAdvisor":
+			res = str.replace(" ", "/");
+			
+			break;
+		case "Yelp":
+			str1 = str.toLowerCase();			
+			str2 = str1.replace(" ", "/");
+			
+			String[] arrayStr = str2.split("/");
+			
+			for(int i = 0; i < arrayStr.length; i++){
+				for(int j = 0; j < comArt.length; j++){
+					patt = Pattern.compile("^"+comArt[j]+"$");
+					
+					matStr = patt.matcher(arrayStr[i]);
+					
+					if(matStr.find()){
+						aux = true;
+					}
+				}
+				
+				if(!aux){
+					res = res+"/"+arrayStr[i];
+				}
+				
+				aux = false;
+			}
+			
+			break;
+		default:
+			break;
+		}
+		
+		return res;
 	}
 	
 	public String fixNumPages(String str){

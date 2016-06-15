@@ -52,6 +52,7 @@ public class ConnectDB{
             String Query = "CREATE TABLE "+ name + ""
             		+ "(idRest int(255) NOT NULL AUTO_INCREMENT, "
             		+ "nRest text NOT NULL, "
+            		+ "nRestKey text NOT NULL, "
             		+ "urlRest text NOT NULL, "
             		+ "idComm int(255), "
             		+ "idVal int(255), "
@@ -105,10 +106,10 @@ public class ConnectDB{
         }
     }
     
-    public void insertDataTableNames(String tName, String nRest, String urlRest){
+    public void insertDataTableNames(String tName, String nRest, String nRestKey, String urlRest){
         try {
-            String Query = "INSERT INTO "+tName+" (idRest, nRest, urlRest, idComm, idVal, idInfo) "
-            		+ "VALUES (NULL, '"+nRest+"', '"+urlRest+"', NULL, NULL, NULL);";
+            String Query = "INSERT INTO "+tName+" (idRest, nRest, nRestKey, urlRest, idComm, idVal, idInfo) "
+            		+ "VALUES (NULL, '"+nRest+"', '"+nRestKey+"', '"+urlRest+"', NULL, NULL, NULL);";
             
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);

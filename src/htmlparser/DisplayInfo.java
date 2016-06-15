@@ -273,8 +273,12 @@ public class DisplayInfo{
 	}
 	
 	public void insertNameURL(ConnectDB db){
+		DataFixer dF = new DataFixer(namePortal);
+		
 		for(String key : mapNameURL.keySet()){
-			db.insertDataTableNames(table_names, key, mapNameURL.get(key));
+			String nameFixed = dF.fixName(key);
+			
+			db.insertDataTableNames(table_names, key, nameFixed, mapNameURL.get(key));
 		}
 	}
 	
