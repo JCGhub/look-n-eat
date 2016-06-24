@@ -34,6 +34,7 @@ public class DatabaseWindow extends JFrame{
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
+		//db.MySQLConnection("adminqeF7LPl", "K9arhYdIy9Ir", "lookneat");
 		db.MySQLConnection("root", "", "lookneat_db");
 		
 		JLabel lblParseView = new JLabel("Parse view");

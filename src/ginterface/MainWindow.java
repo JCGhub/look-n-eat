@@ -53,6 +53,11 @@ public class MainWindow extends JFrame{
 		JButton btnParse = new JButton("Parse web portal");
 		btnParse.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				long time_start, time_end;
+				time_start = System.currentTimeMillis();
+				
+				// Tarea que se va a cronometrar
+				
 				String opt = cBPortal.getSelectedItem().toString();
 				final int n;
 				
@@ -77,7 +82,11 @@ public class MainWindow extends JFrame{
 				
 				final DatabaseWindow dW = new DatabaseWindow(dI);
 				
-				JOptionPane.showMessageDialog(null, "You've parsed "+cBPortal.getSelectedItem().toString()+" successfully!");
+				// Tarea finalizada
+				
+				time_end = System.currentTimeMillis();
+				
+				JOptionPane.showMessageDialog(null, "You've parsed "+cBPortal.getSelectedItem().toString()+" successfully in "+(time_end-time_start)+" milliseconds!");
 				
 				dW.setVisible(true);
 				dispose();

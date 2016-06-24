@@ -195,11 +195,13 @@ public class DisplayInfo{
 		return str;
 	}
 	
-	public String downloadAddress(String key, String URL){
-		String str;
+	public String[] downloadAddress(String key, String URL){
+		DataFixer dF = new DataFixer(namePortal);
+		String[] str = new String[2];
 		
 		HTMLParser hP = new HTMLParser(URL, xPathAddress);
-		str = hP.downloadAsString(namePortal, "address");
+		str[0] = hP.downloadAsString(namePortal, "address");
+		str[1] = dF.fixAddress(str[0]);
 		
 		return str;
 	}
@@ -289,21 +291,9 @@ public class DisplayInfo{
 		try{
 			while(rSet.next()){
 				if(i < 5){ //Sólo los 5 primeros restaurantes, de manera provisional
-					//System.out.println("Entrando en datos del restaurante "+i);
-					
+					//System.out.println("Entrando en datos del restaurante "+i);					
 				    if(mapNameURL.containsKey(rSet.getString("nRest"))){
-				    	String urlRest = mapNameURL.get(rSet.getString("nRest"));
-				    	
-				    	if(nPortal == 1){
-				    		urlRest = "https://www.tripadvisor.es" + urlRest;
-				    		System.out.println(urlRest);
-				    	}
-				    	if(nPortal == 3){
-				    		urlRest = "https://www.yelp.es" + urlRest;
-				    		System.out.println(urlRest);
-				    	}
-				    	
-				    	downloadComm(rSet.getString("nRest"), urlRest);
+				    	downloadComm(rSet.getString("nRest"), mapNameURL.get(rSet.getString("nRest")));
 				    	ArrayList<String> arrayComm = getArrayComm(); //Cogemos solo el array de comentarios actual
 				    	
 				    	for(String comm : arrayComm){
@@ -327,27 +317,21 @@ public class DisplayInfo{
 		
 		try{
 			while(rSet.next()){
-				if(mapNameURL.containsKey(rSet.getString("nRest"))){
-				    String urlRest = mapNameURL.get(rSet.getString("nRest"));
-				    	
-				    if(nPortal == 1){
-				    	urlRest = "https://www.tripadvisor.es" + urlRest;
-				    }
-			    	if(nPortal == 3){
-			    		urlRest = "https://www.yelp.es" + urlRest;
-			    	}
-			    	
+				if(mapNameURL.containsKey(rSet.getString("nRest"))){			    	
 			    	ArrayList<String> arrayVal = new ArrayList<String>();
+			    	String[] arrayAddress = downloadAddress(rSet.getString("nRest"),mapNameURL.get(rSet.getString("nRest")));
 			    	
-			    	arrayVal.add(downloadNumComm(rSet.getString("nRest"),urlRest));
-			    	arrayVal.add(downloadVal(rSet.getString("nRest"),urlRest));
-			    	arrayVal.add(downloadAddress(rSet.getString("nRest"),urlRest));
-			    	arrayVal.add(downloadTel(rSet.getString("nRest"),urlRest));
-			    	arrayVal.add(downloadCoord(rSet.getString("nRest"),urlRest));
+			    	arrayVal.add(downloadNumComm(rSet.getString("nRest"),mapNameURL.get(rSet.getString("nRest"))));
+			    	arrayVal.add(downloadVal(rSet.getString("nRest"),mapNameURL.get(rSet.getString("nRest"))));
+			    	arrayVal.add(arrayAddress[0]);
+			    	arrayVal.add(arrayAddress[1]);
+			    	arrayVal.add(downloadTel(rSet.getString("nRest"),mapNameURL.get(rSet.getString("nRest"))));
+			    	arrayVal.add(downloadCoord(rSet.getString("nRest"),mapNameURL.get(rSet.getString("nRest"))));
 			    	
-			    	db.insertDataTableInfo(table_info, i, arrayVal.get(0), arrayVal.get(1), arrayVal.get(2), arrayVal.get(3), arrayVal.get(4));
+			    	db.insertDataTableInfo(table_info, i, arrayVal.get(0), arrayVal.get(1), arrayVal.get(2), arrayVal.get(3), arrayVal.get(4), arrayVal.get(5));
 				}
 				
+				System.out.println("**"+i+"**: Insertando información del restaurante: "+rSet.getString("nRest"));
 				i++;
 			}
 		}catch(SQLException e){

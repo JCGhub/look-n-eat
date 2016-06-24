@@ -40,7 +40,6 @@ public class ConnectDB{
             String Query = "CREATE DATABASE " + name;
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);
-            MySQLConnection("root", "", name);
             JOptionPane.showMessageDialog(null, "The database " + name + " has been created successfully!");
         } catch (SQLException ex) {
             Logger.getLogger(ConnectDB.class.getName()).log(Level.SEVERE, null, ex);
@@ -93,6 +92,7 @@ public class ConnectDB{
             		+ "nComm text, "
             		+ "valoration text, "
             		+ "address text, "
+            		+ "addressKey text, "
             		+ "tel text, "
             		+ "coord text, "
             		+ "PRIMARY KEY(idInfo))"
@@ -132,10 +132,10 @@ public class ConnectDB{
         }
     }
     
-    public void insertDataTableInfo(String tName, int idRest, String nComm, String valoration, String address, String tel, String coord){
+    public void insertDataTableInfo(String tName, int idRest, String nComm, String valoration, String address, String addressKey, String tel, String coord){
         try {
-            String Query = "INSERT INTO "+tName+" (idInfo, idRest, nComm, valoration, address, tel, coord) "
-            		+ "VALUES (NULL, '"+idRest+"', '"+nComm+"', '"+valoration+"', '"+address+"', '"+tel+"', '"+coord+"');";
+            String Query = "INSERT INTO "+tName+" (idInfo, idRest, nComm, valoration, address, addressKey, tel, coord) "
+            		+ "VALUES (NULL, '"+idRest+"', '"+nComm+"', '"+valoration+"', '"+address+"', '"+addressKey+"', '"+tel+"', '"+coord+"');";
             
             Statement st = Conn.createStatement();
             st.executeUpdate(Query);

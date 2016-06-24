@@ -107,6 +107,9 @@ public class HTMLParser{
     }
 	
 	public Map<String, String> downloadAsMap(String namePortal) {
+		String str, str2, str3, strCod, urlFixed;
+		DataFixer dF = new DataFixer(namePortal);
+		
         if(xPath1.size() > 0) {
         	Map<String, String> results = new HashMap<String, String>();
             
@@ -125,11 +128,14 @@ public class HTMLParser{
                     j++;
                     
                     for (int i = 0; i < nodes1.getLength(); i++) {
-                    	String str = nodes1.item(i).getTextContent();                    	
-                    	String str2 = str.replace("\n", "");                 	
-                    	String strCod = StringEscapeUtils.unescapeHtml4(str2);
+                    	str = nodes1.item(i).getTextContent();
+                    	str2 = str.replace("\n", "");                 	
+                    	strCod = StringEscapeUtils.unescapeHtml4(str2);
                     	
-                        results.put(strCod, nodes2.item(i).getTextContent());
+                    	str3 = nodes2.item(i).getTextContent();
+                    	urlFixed = dF.fixURL(str3);
+                    	
+                        results.put(strCod, urlFixed);
                     }
                 }
                 
@@ -178,9 +184,6 @@ public class HTMLParser{
                     switch(data){
                     case "val":
                     	resultCod = dF.fixVal(resultCod);
-                    	break;
-                    case "address":
-                    	resultCod = dF.fixAddress(resultCod);
                     	break;
                     case "numPagesRest":
                     	resultCod = dF.fixNumPages(resultCod);
